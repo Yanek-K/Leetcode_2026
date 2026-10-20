@@ -23,13 +23,15 @@ public class leafSimilarTrees {
 
     }
 
-    public boolean countHeight(TreeNode root)  {
-        if (root.val == null) return 0;
-        else return 1 + Math.max(countHeight(root.left), countHeight(root.right);
+    public int countHeight(TreeNode root) {
+        if (root == null)
+            return 0;
+        else
+            return 1 + Math.max(countHeight(root.left), countHeight(root.right));
     }
 
     public static void main(String[] args) {
-
+        TreeNode root1 = [3,5,1,6,2,9,8,null,null,7,4]
     }
 
 }
