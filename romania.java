@@ -68,7 +68,7 @@ public class romania {
         return result;
     }
 
-    static List<Integer> dfs(String startString, String goalString) {
+    static List<Integer> depthFirstSearch(String startString, String goalString) {
         int start = indexOf(startString);
         int goal = indexOf(goalString);
 
@@ -113,6 +113,78 @@ public class romania {
         return result;
     }
 
+    static List<Integer> breadthFirstSearch(String startString, String goalString) {
+        System.out.println("Starting Breadth First Search");
+
+        int start = indexOf(startString);
+        int goal = indexOf(goalString);
+
+        boolean[] reached = new boolean[20];
+        int[] parent = new int[20];
+
+        Deque<Integer> queue = new ArrayDeque<>();
+        List<Integer> frontier = new ArrayList<>();
+
+        System.out.println("Added first item to queue:" + start);
+        queue.offer(start);
+
+        while (!queue.isEmpty()) {
+            System.out.println("Queue is not empty " + queue);
+            int nextVisit = queue.poll();
+            System.out.println("Next Node  to visit: " + nextVisit);
+
+            System.out.println("Checking if we have seen this node before...");
+            if (reached[nextVisit])
+                continue;
+
+            frontier.add(nextVisit);
+            System.out.println("Add it to the frontier: " + frontier);
+            reached[nextVisit] = true;
+
+            System.out.println("Check if it is a goal...");
+            if (nextVisit == goal) {
+                List<Integer> path = new ArrayList<>();
+
+                int city = goal;
+
+                while (city != start) {
+                    path.add(city);
+                    city = parent[city];
+                }
+
+                path.add(start);
+                Collections.reverse(path);
+                return path;
+            }
+
+            System.out.println("Get all neighbours of: " + nextVisit);
+            for (Integer neighbour : getNeighbours(nextVisit)) {
+
+                if (!reached[neighbour]) {
+                    System.out.println("New Neighbour: " + neighbour);
+                    queue.offer(neighbour);
+                    System.out.println("Parent[neighbour] " + neighbour + "= " + parent[neighbour - 1]);
+                    // Who is the parent of this neighbour
+                    parent[neighbour] = nextVisit;
+                }
+            }
+        }
+        return frontier;
+    }
+
+    static String toString(List<Integer> path) {
+        String result = "";
+
+        for (int i = 0; i < path.size(); i++) {
+            result += cities[path.get(i)];
+
+            if (i != path.size() - 1) {
+                result += " -> ";
+            }
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
         addRoad("Arad", "Zerind", 75);
         addRoad("Arad", "Sibiu", 140);
@@ -138,9 +210,11 @@ public class romania {
         addRoad("Vaslui", "Iasi", 92);
         addRoad("Iasi", "Neamt", 87);
 
-        myNeighbour("Arad");
+        String dfs = toString(depthFirstSearch("Arad", "Bucharest"));
+        System.out.println("Depth First Search: " + dfs);
 
-        System.out.println(dfs("Arad", "Bucharest"));
+        String bfs = toString(breadthFirstSearch("Arad", "Bucharest"));
+        System.out.println("Breadth First Search: " + bfs);
 
     }
 }
