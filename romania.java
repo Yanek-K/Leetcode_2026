@@ -72,6 +72,9 @@ public class romania {
         int start = indexOf(startString);
         int goal = indexOf(goalString);
 
+        boolean[] reached = new boolean[20];
+        int[] parent = new int[20];
+
         Deque<Integer> stack = new ArrayDeque<>();
         List<Integer> result = new ArrayList<>();
 
@@ -79,18 +82,34 @@ public class romania {
 
         while (!stack.isEmpty()) {
             int nextVisit = stack.pop();
+            if (reached[nextVisit])
+                continue;
+
             result.add(nextVisit);
+            reached[nextVisit] = true;
 
             if (nextVisit == goal) {
-                return result;
+                List<Integer> path = new ArrayList<>();
+
+                int city = goal;
+
+                while (city != start) {
+                    path.add(city);
+                    city = parent[city];
+                }
+
+                path.add(start);
+                Collections.reverse(path);
+                return path;
             }
 
             for (Integer neighbour : getNeighbours(nextVisit)) {
-                stack.push(neighbour);
+                if (!reached[neighbour]) {
+                    stack.push(neighbour);
+                    parent[neighbour] = nextVisit;
+                }
             }
-
         }
-
         return result;
     }
 
@@ -121,7 +140,7 @@ public class romania {
 
         myNeighbour("Arad");
 
-        dfs("Arad", "Bucharest");
+        System.out.println(dfs("Arad", "Bucharest"));
 
     }
 }
