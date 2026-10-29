@@ -90,20 +90,52 @@ public class aStarSearch {
         return neighbours;
     }
 
-    static void search(int start) {
+    static TreeNode search(int start) {
+        // Create a new treenode with the starting point
         TreeNode root = new TreeNode(start, null);
 
-        LinkedList<TreeNode> frontier = new LinkedList<>();
+        // Create a linked list to store the frontier of nodes to visit
+        // Take the next item off of the frontier list
+        // Implemented as a First in, First Out Queue
+        // ---> LinkedList<TreeNode> frontier = new LinkedList<>();
+
+        // Implemented as a Priority Queue (With minHeap)
+        PriorityQueue<TreeNode> frontier = new PriorityQueue<>(Comparator.comparingInt());
+
+        // Create a boolean array to keep track of visited nodes
+        boolean[] reached = new boolean[heuristic_vector.length];
+
+        // Add the root to the frontier of nodes to visit
         frontier.add(root);
+        reached[start] = true;
 
         while (!frontier.isEmpty()) {
+            // Take the next item off of the frontier list
             TreeNode current = frontier.poll();
+
+            // Check if current node is a goal
+            if (heuristic_vector[current.val] == 0) {
+                return current;
+            }
+
+            // If not a goal, get the current node's neighbours
+            // and add them to the frontier to search
             ArrayList<Integer> neighbours = getNeighbours(current);
             for (int i = 0; i < neighbours.size(); i++) {
-                TreeNode next = new TreeNode(neighbours.get(i), current);
-                frontier.add(next);
+                // if we have seen this node before skip it
+                int next = neighbours.get(i);
+                if (reached[next]) {
+                    continue;
+                }
+                // otherwise:
+                // Create a new TreeNode,
+                // Add it to the frontier and Mark it as visited
+                TreeNode nextNode = new TreeNode(next, current);
+                frontier.add(nextNode);
+                reached[next] = true;
             }
         }
+        return null;
 
     }
 
@@ -119,7 +151,9 @@ public class aStarSearch {
 
         // get Path Cost for a path from start to goal
         int[] path = { 0, 4, 6, 9 };
-        System.out.println(pathCost(path));
+        // System.out.println(pathCost(path));
+
+        System.out.println(search(0).val);
     }
 
 }
