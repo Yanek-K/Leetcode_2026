@@ -15,6 +15,8 @@
 
 */
 
+import java.util.*;
+
 public class aStarSearch {
 
     public static class TreeNode {
@@ -53,18 +55,71 @@ public class aStarSearch {
         }
     }
 
-    static void pathCost(int[] path) {
+    static int pathCost(int[] path) {
+        // Have a count variable and add the cost of each traverse
+        // At position i, we are leaving path[i]
+        // int[] path example -> {0,4,6,9} {A, E, J, G3}
+        int count = 0;
+
+        for (int i = 0; i < path.length - 1; i++) {
+            // col is from
+            int col = path[i];
+            // row is to
+            int row = path[i + 1];
+            int cost = cost_matrix[row][col];
+
+            if (cost == 0) {
+                return -1;
+            }
+
+            count += cost;
+        }
+
+        return count;
 
     }
 
-    static void bfs()
+    static ArrayList<Integer> getNeighbours(TreeNode current) {
+        ArrayList<Integer> neighbours = new ArrayList<>();
+
+        for (int i = 0; i < cost_matrix.length; i++) {
+            if (cost_matrix[i][current.val] > 0) {
+                neighbours.add(i);
+            }
+        }
+        return neighbours;
+    }
+
+    static void search(int start) {
+        TreeNode root = new TreeNode(start, null);
+
+        LinkedList<TreeNode> frontier = new LinkedList<>();
+        frontier.add(root);
+
+        while (!frontier.isEmpty()) {
+            TreeNode current = frontier.poll();
+            ArrayList<Integer> neighbours = getNeighbours(current);
+            for (int i = 0; i < neighbours.size(); i++) {
+                TreeNode next = new TreeNode(neighbours.get(i), current);
+                frontier.add(next);
+            }
+        }
+
+    }
+
+    // static void bfs()
 
     public static void main(String[] args) {
-        for (int i = 0; i < 10; i++) {
-            System.out.println("From " + names[i]);
-            printNeighbours(i);
+        // Print Neighbours
+        // for (int i = 0; i < names.length; i++) {
+        // System.out.println("From " + names[i]);
+        // printNeighbours(i);
 
-        }
+        // }
+
+        // get Path Cost for a path from start to goal
+        int[] path = { 0, 4, 6, 9 };
+        System.out.println(pathCost(path));
     }
 
 }
