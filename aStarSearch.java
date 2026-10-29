@@ -21,10 +21,12 @@ public class aStarSearch {
 
     public static class TreeNode {
         int val;
+        int g;
         TreeNode parent;
 
-        TreeNode(int val, TreeNode parent) {
+        TreeNode(int val, int g, TreeNode parent) {
             this.val = val;
+            this.g = g;
             this.parent = parent;
         }
     }
@@ -92,7 +94,7 @@ public class aStarSearch {
 
     static TreeNode search(int start) {
         // Create a new treenode with the starting point
-        TreeNode root = new TreeNode(start, null);
+        TreeNode root = new TreeNode(start, 0, null);
 
         // Create a linked list to store the frontier of nodes to visit
         // Take the next item off of the frontier list
@@ -100,7 +102,7 @@ public class aStarSearch {
         // ---> LinkedList<TreeNode> frontier = new LinkedList<>();
 
         // Implemented as a Priority Queue (With minHeap)
-        PriorityQueue<TreeNode> frontier = new PriorityQueue<>(Comparator.comparingInt());
+        PriorityQueue<TreeNode> frontier = new PriorityQueue<>(Comparator.comparingInt(n -> n.g));
 
         // Create a boolean array to keep track of visited nodes
         boolean[] reached = new boolean[heuristic_vector.length];
@@ -130,7 +132,7 @@ public class aStarSearch {
                 // otherwise:
                 // Create a new TreeNode,
                 // Add it to the frontier and Mark it as visited
-                TreeNode nextNode = new TreeNode(next, current);
+                TreeNode nextNode = new TreeNode(next, current.g + cost_matrix[next][current.val], current);
                 frontier.add(nextNode);
                 reached[next] = true;
             }
@@ -150,10 +152,12 @@ public class aStarSearch {
         // }
 
         // get Path Cost for a path from start to goal
-        int[] path = { 0, 4, 6, 9 };
+        // int[] path = { 0, 4, 6, 9 };
         // System.out.println(pathCost(path));
 
-        System.out.println(search(0).val);
+        TreeNode result = search(0);
+
+        System.out.println(names[result.val] + " cost is: " + result.g);
     }
 
 }
