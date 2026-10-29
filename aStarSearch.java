@@ -96,20 +96,23 @@ public class aStarSearch {
         // Create a new treenode with the starting point
         TreeNode root = new TreeNode(start, 0, null);
 
-        // Create a linked list to store the frontier of nodes to visit
+        // Create a Priority Queue to store the frontier of nodes to visit
         // Take the next item off of the frontier list
         // Implemented as a First in, First Out Queue
         // ---> LinkedList<TreeNode> frontier = new LinkedList<>();
 
         // Implemented as a Priority Queue (With minHeap)
-        PriorityQueue<TreeNode> frontier = new PriorityQueue<>(Comparator.comparingInt(n -> n.g));
+        PriorityQueue<TreeNode> frontier = new PriorityQueue<>(
+                Comparator.comparingInt(n -> n.g + heuristic_vector[n.val]));
 
-        // Create a boolean array to keep track of visited nodes
-        boolean[] reached = new boolean[heuristic_vector.length];
+        // Create a int array to keep track of visited nodes
+        // Fill with MAX so that the first path is always allowed in
+        int[] reached = new int[heuristic_vector.length];
+        Arrays.fill(reached, Integer.MAX_VALUE);
 
         // Add the root to the frontier of nodes to visit
         frontier.add(root);
-        reached[start] = true;
+        reached[start] = 0;
 
         while (!frontier.isEmpty()) {
             // Take the next item off of the frontier list
@@ -124,17 +127,19 @@ public class aStarSearch {
             // and add them to the frontier to search
             ArrayList<Integer> neighbours = getNeighbours(current);
             for (int i = 0; i < neighbours.size(); i++) {
-                // if we have seen this node before skip it
+                // skip if we already have an equal or cheaper path
+                // to this node.
                 int next = neighbours.get(i);
-                if (reached[next]) {
+                int newCost = current.g + cost_matrix[next][current.val];
+                if (reached[next] <= newCost) {
                     continue;
                 }
                 // otherwise:
                 // Create a new TreeNode,
                 // Add it to the frontier and Mark it as visited
-                TreeNode nextNode = new TreeNode(next, current.g + cost_matrix[next][current.val], current);
+                TreeNode nextNode = new TreeNode(next, newCost, current);
                 frontier.add(nextNode);
-                reached[next] = true;
+                reached[next] = newCost;
             }
         }
         return null;
@@ -144,16 +149,6 @@ public class aStarSearch {
     // static void bfs()
 
     public static void main(String[] args) {
-        // Print Neighbours
-        // for (int i = 0; i < names.length; i++) {
-        // System.out.println("From " + names[i]);
-        // printNeighbours(i);
-
-        // }
-
-        // get Path Cost for a path from start to goal
-        // int[] path = { 0, 4, 6, 9 };
-        // System.out.println(pathCost(path));
 
         TreeNode result = search(0);
 
