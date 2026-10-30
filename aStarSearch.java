@@ -1,17 +1,4 @@
 /*
-| From >| A | B | C | D | E | H | J | 1 | 2 | 3 |
-|-------|---|---|---|---|---|---|---|---|---|---|
-| **A** | 0 | 0 | 0 | 6 | 1 | 0 | 0 | 0 | 0 | 0 |
-| **B** | 5 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **C** | 9 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **D** | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 0 | 0 |
-| **E** | 6 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 |
-| **H** | 0 | 0 | 0 | 7 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **J** | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 |
-| **G1* | 0 | 9 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **G2* | 0 | 0 | 0 | 5 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **G3* | 0 | 0 | 0 | 0 | 0 | 8 | 7 | 0 | 0 | 0 |
-
 
 */
 
@@ -20,7 +7,9 @@ import java.util.*;
 public class aStarSearch {
 
     public static class TreeNode {
+        // val is position in matrix
         int val;
+        // g is cost to get to this node from the starting point.
         int g;
         TreeNode parent;
 
@@ -31,57 +20,8 @@ public class aStarSearch {
         }
     }
 
-    static int[][] cost_matrix = {
-            { 0, 0, 0, 6, 1, 0, 0, 0, 0, 0 },
-            { 5, 0, 2, 0, 0, 0, 0, 0, 0, 0 },
-            { 9, 3, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 1, 0, 2, 0, 0, 0, 0, 0 },
-            { 6, 0, 0, 0, 0, 2, 0, 0, 0, 0 },
-            { 0, 0, 0, 7, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 2, 0, 0, 0, 0, 0 },
-            { 0, 9, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 5, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 8, 7, 0, 0, 0 }
-    };
-
-    static int[] heuristic_vector = { 5, 7, 3, 4, 6, 8, 5, 0, 0, 0 };
-
-    static String[] names = { "A", "B", "C", "D", "E", "H", "J", "G1", "G2", "G3" };
-
-    static void printNeighbours(int node) {
-        for (int i = 0; i < cost_matrix.length; i++) {
-            if (cost_matrix[i][node] > 0) {
-                System.out.println("Neighbour: " + names[i] + ". Cost: " + cost_matrix[i][node] + " Heuristic: "
-                        + heuristic_vector[i]);
-            }
-        }
-    }
-
-    static int pathCost(int[] path) {
-        // Have a count variable and add the cost of each traverse
-        // At position i, we are leaving path[i]
-        // int[] path example -> {0,4,6,9} {A, E, J, G3}
-        int count = 0;
-
-        for (int i = 0; i < path.length - 1; i++) {
-            // col is From
-            int col = path[i];
-            // row is To
-            int row = path[i + 1];
-            int cost = cost_matrix[row][col];
-
-            if (cost == 0) {
-                return -1;
-            }
-
-            count += cost;
-        }
-
-        return count;
-
-    }
-
-    static ArrayList<Integer> getNeighbours(TreeNode current) {
+    // Helper function to get all neighbours of a node
+    static ArrayList<Integer> getNeighbours(TreeNode current, int[][] cost_matrix) {
         ArrayList<Integer> neighbours = new ArrayList<>();
 
         for (int i = 0; i < cost_matrix.length; i++) {
@@ -92,8 +32,10 @@ public class aStarSearch {
         return neighbours;
     }
 
-    static TreeNode search(int start) {
-        // Create a new treenode with the starting point
+    // The A* Search
+    // Returns a TreeNode as the Goal State Found.
+    static TreeNode search(int start, int[][] cost_matrix, int[] heuristic_vector, int[] goal_vector) {
+        // Create a new Treenode with the starting point
         TreeNode root = new TreeNode(start, 0, null);
 
         // Create a Priority Queue (min heap) to store the frontier of nodes to visit
@@ -101,8 +43,8 @@ public class aStarSearch {
         PriorityQueue<TreeNode> frontier = new PriorityQueue<>(
                 Comparator.comparingInt(n -> n.g + heuristic_vector[n.val]));
 
-        // Create a int array to keep track of visited nodes
-        // Fill with MAX so that the first path is always allowed in
+        // Create a int array to keep track of best cost found to each node
+        // Fill with MAX so that the first path is always allowed
         int[] reached = new int[heuristic_vector.length];
         Arrays.fill(reached, Integer.MAX_VALUE);
 
@@ -116,13 +58,13 @@ public class aStarSearch {
             TreeNode current = frontier.poll();
 
             // Check if current node is a goal
-            if (heuristic_vector[current.val] == 0) {
+            if (goal_vector[current.val] == 1) {
                 return current;
             }
 
             // If not a goal, get the current node's neighbours
             // and add them to the frontier to search
-            ArrayList<Integer> neighbours = getNeighbours(current);
+            ArrayList<Integer> neighbours = getNeighbours(current, cost_matrix);
             for (int i = 0; i < neighbours.size(); i++) {
 
                 // skip if we already have an equal or cheaper path
@@ -137,7 +79,6 @@ public class aStarSearch {
                 // Add it to the frontier and mark it as the best cost
                 TreeNode nextNode = new TreeNode(next, newCost, current);
                 frontier.add(nextNode);
-                System.out.println(frontier.peek().val);
                 reached[next] = newCost;
             }
         }
@@ -145,11 +86,68 @@ public class aStarSearch {
 
     }
 
+    // Helper function to build the path from the Goal State
+    // Uses a stack and pops to reverse the order of the Parent Node
+    static int[] getPath(TreeNode current) {
+        Deque<Integer> stack = new ArrayDeque<>();
+
+        while (current != null) {
+            stack.push(current.val);
+            current = current.parent;
+        }
+
+        int[] result = new int[stack.size()];
+
+        for (int i = 0; i < result.length; i++) {
+            result[i] = stack.pop();
+        }
+
+        return result;
+    }
+
     public static void main(String[] args) {
+        int[][] cost_matrix = {
+                { 0, 0, 0, 6, 1, 0, 0, 0, 0, 0 },
+                { 5, 0, 2, 0, 0, 0, 0, 0, 0, 0 },
+                { 9, 3, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 2, 0, 0, 0, 0, 0 },
+                { 6, 0, 0, 0, 0, 2, 0, 0, 0, 0 },
+                { 0, 0, 0, 7, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 2, 0, 0, 0, 0, 0 },
+                { 0, 9, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 5, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 8, 7, 0, 0, 0 }
+        };
 
-        TreeNode result = search(0);
+        int[] heuristic_vector = { 5, 7, 3, 4, 6, 8, 5, 0, 0, 0 };
+        String[] names = { "A", "B", "C", "D", "E", "H", "J", "G1", "G2", "G3" };
 
-        System.out.println(names[result.val] + " cost is: " + result.g);
+        // Create a goal vector
+        int[] goal_vector = new int[heuristic_vector.length];
+
+        for (int i = 0; i < goal_vector.length; i++) {
+            goal_vector[i] = heuristic_vector[i] == 0 ? 1 : 0;
+        }
+
+        // Perform the A* Search
+        TreeNode goalState = search(0, cost_matrix, heuristic_vector, goal_vector);
+
+        // Print the cheapest path
+        int[] resultPath = getPath(goalState);
+
+        System.out.println("The cheapest path to " + names[goalState.val] + " is: ");
+
+        for (int path : resultPath) {
+            System.out.print(names[path] + " ");
+        }
+        System.out.println("");
+        System.out.println("Total cost to get there is: " + goalState.g);
+
+        // Print Goal State
+        System.out.println("Goal State Found: " + names[goalState.val]);
+
+        // Print the number of cycles
+
     }
 
 }
