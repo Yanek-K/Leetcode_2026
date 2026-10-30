@@ -6,6 +6,16 @@ import java.util.*;
 
 public class aStarSearch {
 
+    public static class SearchResult {
+        int count;
+        TreeNode goalState;
+
+        SearchResult(int count, TreeNode goalState) {
+            this.count = count;
+            this.goalState = goalState;
+        }
+    }
+
     public static class TreeNode {
         // val is position in matrix
         int val;
@@ -34,9 +44,12 @@ public class aStarSearch {
 
     // The A* Search
     // Returns a TreeNode as the Goal State Found.
-    static TreeNode search(int start, int[][] cost_matrix, int[] heuristic_vector, int[] goal_vector) {
+    static SearchResult search(int start, int[][] cost_matrix, int[] heuristic_vector, int[] goal_vector) {
         // Create a new Treenode with the starting point
         TreeNode root = new TreeNode(start, 0, null);
+
+        // Create a counter to for cycles
+        int count = 0;
 
         // Create a Priority Queue (min heap) to store the frontier of nodes to visit
         // Take the next item off of the frontier list
@@ -53,13 +66,13 @@ public class aStarSearch {
         reached[start] = 0;
 
         while (!frontier.isEmpty()) {
-
+            count++;
             // Take the next item off of the frontier list
             TreeNode current = frontier.poll();
 
             // Check if current node is a goal
             if (goal_vector[current.val] == 1) {
-                return current;
+                return new SearchResult(count, current);
             }
 
             // If not a goal, get the current node's neighbours
@@ -75,15 +88,14 @@ public class aStarSearch {
                     continue;
                 }
 
-                // Otherwise: Create a new TreeNode,
-                // Add it to the frontier and mark it as the best cost
+                // Otherwise create a new TreeNode,
+                // add it to the frontier and mark it as the best cost
                 TreeNode nextNode = new TreeNode(next, newCost, current);
                 frontier.add(nextNode);
                 reached[next] = newCost;
             }
         }
-        return null;
-
+        return new SearchResult(count, null);
     }
 
     // Helper function to build the path from the Goal State
@@ -130,7 +142,9 @@ public class aStarSearch {
         }
 
         // Perform the A* Search
-        TreeNode goalState = search(0, cost_matrix, heuristic_vector, goal_vector);
+        SearchResult result = search(0, cost_matrix, heuristic_vector, goal_vector);
+        TreeNode goalState = result.goalState;
+        int count = result.count;
 
         // Print the cheapest path
         int[] resultPath = getPath(goalState);
@@ -147,6 +161,7 @@ public class aStarSearch {
         System.out.println("Goal State Found: " + names[goalState.val]);
 
         // Print the number of cycles
+        System.out.println("The total number of cycles is: " + count);
 
     }
 
