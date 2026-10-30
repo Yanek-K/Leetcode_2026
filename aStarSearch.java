@@ -64,9 +64,9 @@ public class aStarSearch {
         int count = 0;
 
         for (int i = 0; i < path.length - 1; i++) {
-            // col is from
+            // col is From
             int col = path[i];
-            // row is to
+            // row is To
             int row = path[i + 1];
             int cost = cost_matrix[row][col];
 
@@ -96,12 +96,8 @@ public class aStarSearch {
         // Create a new treenode with the starting point
         TreeNode root = new TreeNode(start, 0, null);
 
-        // Create a Priority Queue to store the frontier of nodes to visit
+        // Create a Priority Queue (min heap) to store the frontier of nodes to visit
         // Take the next item off of the frontier list
-        // Implemented as a First in, First Out Queue
-        // ---> LinkedList<TreeNode> frontier = new LinkedList<>();
-
-        // Implemented as a Priority Queue (With minHeap)
         PriorityQueue<TreeNode> frontier = new PriorityQueue<>(
                 Comparator.comparingInt(n -> n.g + heuristic_vector[n.val]));
 
@@ -115,6 +111,7 @@ public class aStarSearch {
         reached[start] = 0;
 
         while (!frontier.isEmpty()) {
+
             // Take the next item off of the frontier list
             TreeNode current = frontier.poll();
 
@@ -127,6 +124,7 @@ public class aStarSearch {
             // and add them to the frontier to search
             ArrayList<Integer> neighbours = getNeighbours(current);
             for (int i = 0; i < neighbours.size(); i++) {
+
                 // skip if we already have an equal or cheaper path
                 // to this node.
                 int next = neighbours.get(i);
@@ -134,19 +132,18 @@ public class aStarSearch {
                 if (reached[next] <= newCost) {
                     continue;
                 }
-                // otherwise:
-                // Create a new TreeNode,
-                // Add it to the frontier and Mark it as visited
+
+                // Otherwise: Create a new TreeNode,
+                // Add it to the frontier and mark it as the best cost
                 TreeNode nextNode = new TreeNode(next, newCost, current);
                 frontier.add(nextNode);
+                System.out.println(frontier.peek().val);
                 reached[next] = newCost;
             }
         }
         return null;
 
     }
-
-    // static void bfs()
 
     public static void main(String[] args) {
 
