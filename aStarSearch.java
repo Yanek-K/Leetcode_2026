@@ -1,11 +1,26 @@
 /*
-
-*/
+ *
+ * aStarSearch.java
+ * 
+ * Assignment 2
+ * Comp 3711 - Applied Artificial Intelligence.
+ *
+ * Student Name: Yanek Keshavjee
+ * Student Number: T00678947
+ *
+ * A search program that takes a cost_matrix and finds the shortest path 
+ * using A* Search --> F(n) = h(n) + g(n)
+ *
+ */
 
 import java.util.*;
 
 public class aStarSearch {
 
+    /* 
+    * 
+    *
+    */
     public static class SearchResult {
         int count;
         TreeNode goalState;
@@ -16,6 +31,10 @@ public class aStarSearch {
         }
     }
 
+    /* 
+    *
+    *
+    */
     public static class TreeNode {
         // val is position in matrix
         int val;
@@ -30,6 +49,10 @@ public class aStarSearch {
         }
     }
 
+    /* 
+    *
+    *
+    */
     // Helper function to get all neighbours of a node
     static ArrayList<Integer> getNeighbours(TreeNode current, int[][] cost_matrix) {
         ArrayList<Integer> neighbours = new ArrayList<>();
@@ -42,9 +65,36 @@ public class aStarSearch {
         return neighbours;
     }
 
+    // Helper function to build the path from the Goal State
+    // Uses a stack and pops to reverse the order of the Parent Node
+    /* 
+    *
+    *
+    */
+    static int[] getPath(TreeNode current) {
+        Deque<Integer> stack = new ArrayDeque<>();
+
+        while (current != null) {
+            stack.push(current.val);
+            current = current.parent;
+        }
+
+        int[] result = new int[stack.size()];
+
+        for (int i = 0; i < result.length; i++) {
+            result[i] = stack.pop();
+        }
+
+        return result;
+    }
+
     // The A* Search
     // Returns a TreeNode as the Goal State Found.
-    static SearchResult search(int start, int[][] cost_matrix, int[] heuristic_vector, int[] goal_vector) {
+    /* 
+    *
+    *
+    */
+    static SearchResult search(int start, int[][] cost_matrix, int[] heuristic_vector, int goal) {
         // Create a new Treenode with the starting point
         TreeNode root = new TreeNode(start, 0, null);
 
@@ -71,7 +121,7 @@ public class aStarSearch {
             TreeNode current = frontier.poll();
 
             // Check if current node is a goal
-            if (goal_vector[current.val] == 1) {
+            if (current.val == goal) {
                 return new SearchResult(count, current);
             }
 
@@ -98,25 +148,10 @@ public class aStarSearch {
         return new SearchResult(count, null);
     }
 
-    // Helper function to build the path from the Goal State
-    // Uses a stack and pops to reverse the order of the Parent Node
-    static int[] getPath(TreeNode current) {
-        Deque<Integer> stack = new ArrayDeque<>();
-
-        while (current != null) {
-            stack.push(current.val);
-            current = current.parent;
-        }
-
-        int[] result = new int[stack.size()];
-
-        for (int i = 0; i < result.length; i++) {
-            result[i] = stack.pop();
-        }
-
-        return result;
-    }
-
+    /* 
+    *
+    *
+    */
     public static void main(String[] args) {
         int[][] cost_matrix = {
                 { 0, 0, 0, 6, 1, 0, 0, 0, 0, 0 },
@@ -137,31 +172,37 @@ public class aStarSearch {
         // Create a goal vector
         int[] goal_vector = new int[heuristic_vector.length];
 
+        // goal_vector = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1}
         for (int i = 0; i < goal_vector.length; i++) {
             goal_vector[i] = heuristic_vector[i] == 0 ? 1 : 0;
         }
 
         // Perform the A* Search
-        SearchResult result = search(0, cost_matrix, heuristic_vector, goal_vector);
-        TreeNode goalState = result.goalState;
-        int count = result.count;
+        for (int i = 0; i < heuristic_vector.length; i++) {
+            if (goal_vector[i] == 1) {
 
-        // Print the cheapest path
-        int[] resultPath = getPath(goalState);
+                SearchResult result = search(0, cost_matrix, heuristic_vector, i);
+                TreeNode goalState = result.goalState;
+                int count = result.count;
 
-        System.out.println("The cheapest path to " + names[goalState.val] + " is: ");
+                // Print Goal State
+                System.out.println("Goal State Found: " + names[goalState.val]);
 
-        for (int path : resultPath) {
-            System.out.print(names[path] + " ");
+                // Print the cheapest path
+                int[] resultPath = getPath(goalState);
+
+                System.out.println("The cheapest path to " + names[goalState.val] + " is: ");
+
+                for (int path : resultPath) {
+                    System.out.print(names[path] + " ");
+                }
+                System.out.println("");
+                System.out.println("Total cost to get there is: " + goalState.g);
+
+                // Print the number of cycles
+                System.out.println("The total number of cycles is: " + count);
+            }
         }
-        System.out.println("");
-        System.out.println("Total cost to get there is: " + goalState.g);
-
-        // Print Goal State
-        System.out.println("Goal State Found: " + names[goalState.val]);
-
-        // Print the number of cycles
-        System.out.println("The total number of cycles is: " + count);
 
     }
 
