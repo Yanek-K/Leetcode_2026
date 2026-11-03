@@ -8,7 +8,7 @@
  * Student Name: Yanek Keshavjee
  * Student Number: T00678947
  *
- * A search program that takes a cost_matrix and finds the shortest path 
+ * A search program that takes a cost_matrix and finds the cheapest path 
  * using A* Search --> F(n) = h(n) + g(n)
  *
  */
@@ -17,10 +17,11 @@ import java.util.*;
 
 public class aStarSearch {
 
-    /* 
-    * 
-    *
-    */
+    /*
+     * A Search Result class
+     * Used to return more than one value from the main search function (Count and
+     * Goal State)
+     */
     public static class SearchResult {
         int count;
         TreeNode goalState;
@@ -31,14 +32,12 @@ public class aStarSearch {
         }
     }
 
-    /* 
-    *
-    *
-    */
+    /*
+     * Each TreeNode is one path to a position
+     * With a position (val), cost from the start (g), and a parent
+     */
     public static class TreeNode {
-        // val is position in matrix
         int val;
-        // g is cost to get to this node from the starting point.
         int g;
         TreeNode parent;
 
@@ -49,11 +48,13 @@ public class aStarSearch {
         }
     }
 
-    /* 
-    *
-    *
-    */
-    // Helper function to get all neighbours of a node
+    /**
+     * Returns all neighbours of a node
+     * 
+     * @param current     The node we are finding neighbours for
+     * @param cost_matrix Edge Costs stored as [To][From]
+     * @return An array list of neighbours
+     */
     static ArrayList<Integer> getNeighbours(TreeNode current, int[][] cost_matrix) {
         ArrayList<Integer> neighbours = new ArrayList<>();
 
@@ -65,13 +66,14 @@ public class aStarSearch {
         return neighbours;
     }
 
-    // Helper function to build the path from the Goal State
-    // Uses a stack and pops to reverse the order of the Parent Node
-    /* 
-    *
-    *
-    */
+    /**
+     * Builds the complete path from Start to Goal State
+     * 
+     * @param current The Goal State we are building the path for
+     * @return Integer Array of the path to the Goal State
+     */
     static int[] getPath(TreeNode current) {
+        // Uses a stack and pops to reverse the order of the Parent Node
         Deque<Integer> stack = new ArrayDeque<>();
 
         while (current != null) {
@@ -81,6 +83,7 @@ public class aStarSearch {
 
         int[] result = new int[stack.size()];
 
+        // Pop to reverse the order
         for (int i = 0; i < result.length; i++) {
             result[i] = stack.pop();
         }
@@ -88,17 +91,20 @@ public class aStarSearch {
         return result;
     }
 
-    // The A* Search
-    // Returns a TreeNode as the Goal State Found.
-    /* 
-    *
-    *
-    */
+    /**
+     * Performs the A* Search
+     *
+     * @param start            The starting node
+     * @param cost_matrix      Edge Costs stored as [To][From]
+     * @param heuristic_vector The heuristic vector
+     * @param goal             A chosen goal state
+     * @return SearchResult Contains the goal node and cycle count
+     */
     static SearchResult search(int start, int[][] cost_matrix, int[] heuristic_vector, int goal) {
         // Create a new Treenode with the starting point
         TreeNode root = new TreeNode(start, 0, null);
 
-        // Create a counter to for cycles
+        // Create a counter to keep track of cycles
         int count = 0;
 
         // Create a Priority Queue (min heap) to store the frontier of nodes to visit
@@ -120,7 +126,7 @@ public class aStarSearch {
             // Take the next item off of the frontier list
             TreeNode current = frontier.poll();
 
-            // Check if current node is a goal
+            // Check if current node is goal we are searching for
             if (current.val == goal) {
                 return new SearchResult(count, current);
             }
@@ -148,11 +154,8 @@ public class aStarSearch {
         return new SearchResult(count, null);
     }
 
-    /* 
-    *
-    *
-    */
     public static void main(String[] args) {
+        // Edge Costs stored as [To][From]
         int[][] cost_matrix = {
                 { 0, 0, 0, 6, 1, 0, 0, 0, 0, 0 },
                 { 5, 0, 2, 0, 0, 0, 0, 0, 0, 0 },
@@ -182,6 +185,11 @@ public class aStarSearch {
             if (goal_vector[i] == 1) {
 
                 SearchResult result = search(0, cost_matrix, heuristic_vector, i);
+                if (result.goalState == null) {
+                    System.out.println("No path found to " + names[i]);
+                    continue;
+
+                }
                 TreeNode goalState = result.goalState;
                 int count = result.count;
 
