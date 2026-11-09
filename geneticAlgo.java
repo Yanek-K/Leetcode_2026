@@ -27,6 +27,7 @@ import java.util.Arrays;
 // mom: A B B B A | A A A A B
 // dad: B A A B B | A B A A A
 // child: A B B B A | A B A A A
+//
 // 3. Mutation -> one small random change. Every so often flip one card to the
 // other pile.
 //
@@ -104,6 +105,14 @@ public class geneticAlgo {
         System.out.println(Arrays.toString(parentB));
 
         System.out.println(toString(parentA));
+
+        int POP_SIZE = 20;
+        int[][] population = new int[20][];
+        for (int i = 0; i < POP_SIZE; i++) {
+            population[i] = randomGuess();
+            System.out.println(toString(population[i]));
+            System.out.println(fitness(population[i]));
+        }
 
     }
 
