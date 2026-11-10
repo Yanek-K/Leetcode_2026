@@ -38,6 +38,7 @@ public class geneticAlgo {
     static Random rand = new Random();
 
     static final int NUM_CARDS = 10;
+    static final int SELECTION_SIZE = 3;
 
     static void geneticSearch(int[][] guesses) {
 
@@ -45,11 +46,25 @@ public class geneticAlgo {
 
     static int[] randomGuess() {
         int[] guess = new int[NUM_CARDS];
+
         for (int i = 0; i < NUM_CARDS; i++) {
-            guess[i] = rand.nextInt(2);
+            if (i < NUM_CARDS / 2) {
+                guess[i] = 0;
+            } else
+                guess[i] = 1;
+        }
+
+        for (int i = 0; i < NUM_CARDS; i++) {
+            int j = rand.nextInt(NUM_CARDS);
+
+            int temp = guess[i];
+            guess[i] = guess[j];
+            guess[j] = temp;
         }
         return guess;
     }
+
+    // rand.nextInt(2);
 
     static int fitness(int[] guess) {
 
@@ -75,6 +90,20 @@ public class geneticAlgo {
         return (fitness);
     }
 
+    static int[] selection(int[][] population) {
+        int[] lowest = population[rand.nextInt(population.length)];
+
+        for (int i = 1; i < SELECTION_SIZE; i++) {
+            int[] selection = population[rand.nextInt(population.length)];
+
+            if (fitness(selection) < fitness(lowest)) {
+                lowest = selection;
+            }
+        }
+
+        return lowest;
+    }
+
     static String toString(int[] guess) {
         String pileA = "";
         int pileAValue = 0;
@@ -97,23 +126,17 @@ public class geneticAlgo {
     }
 
     public static void main(String[] args) {
-        //
-        int[] parentA = randomGuess();
-        int[] parentB = randomGuess();
-
-        System.out.println(Arrays.toString(parentA));
-        System.out.println(Arrays.toString(parentB));
-
-        System.out.println(toString(parentA));
-
         int POP_SIZE = 20;
-        int[][] population = new int[20][];
+        int[][] population = new int[POP_SIZE][];
         for (int i = 0; i < POP_SIZE; i++) {
             population[i] = randomGuess();
             System.out.println(toString(population[i]));
-            System.out.println(fitness(population[i]));
+            System.out.println("Fitness is: " + fitness(population[i]));
         }
 
-    }
+        int[] select = selection(population);
+        System.out.println(toString(select));
+        System.out.println("Selected Fitness is: " + fitness(select));
 
+    }
 }
