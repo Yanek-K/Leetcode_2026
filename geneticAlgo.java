@@ -14,8 +14,8 @@ import java.util.Arrays;
 //      Kids with best scores get to be parents more often
 //      Bad scores might still get picked so there is variety
 //      So one parent is a full int[] guess -> [0, 1, 1, 1, 0, 0, 0, 0, 0, 1]
-//      => Pile A -> 1, 5, 6, 7, 8, 9
-//      => Pile B -> 2, 3, 4, 10
+//      => Pile A -> 1, 5, 6, 7, 8
+//      => Pile B -> 2, 3, 4, 9, 10
 
 // 2. Crossover -> generate new child by combining contents of the two parents
 //      Mix Two Rows
@@ -35,10 +35,6 @@ public class geneticAlgo {
 
     static final int NUM_CARDS = 10;
     static final int SELECTION_SIZE = 3;
-
-    static void geneticSearch(int[][] guesses) {
-
-    }
 
     // fill an int[10] with 5 0s and 5 1s randomly
     // i.e. make a guess as to what the answer is
@@ -130,34 +126,77 @@ public class geneticAlgo {
     static int[] repair(int[] child) {
         int count = 0;
 
-        // NEEDS WORK HERE>>>\\\\
-        //
-        //
-        // Phase 1: a for loop that only counts the 0s. No fixing inside it.
-        // Phase 2: after the loop finishes:
-        // while (count > 5): pick a random slot.
-        // If it’s a 0, flip it to 1 and do count--.
-        // If not, do nothing, and the while will pick again.
-        // while (count < 5):
-        // The mirror image, flipping a 1 to a 0 and doing count++.
-        //
-        //
         for (int i = 0; i < NUM_CARDS; i++) {
             if (child[i] == 0) {
                 count++;
             }
-            if (count == 5) {
-                int rando = rand.nextInt(10);
-                while (child[rando] == 0) {
-                    child[rando] = 1;
-                }
+        }
+
+        while (count > NUM_CARDS / 2) {
+            int rando = rand.nextInt(NUM_CARDS) + 1;
+            if (child[rando] == 0) {
+                child[rando] = 1;
+                count--;
+            }
+        }
+
+        while (count < NUM_CARDS / 2) {
+            int rando = rand.nextInt(NUM_CARDS) + 1;
+            if (child[rando] == 1) {
+                child[rando] = 0;
+                count++;
             }
         }
         return child;
     }
 
-    // String representation of a guess
-    static String toString(int[] guess) {
+    // mutates a child by swapping a random 1 with a random 0.
+    static int[] mutate(int[] child) {
+
+        int zero;
+        int one;
+
+        do {
+            zero = rand.nextInt(NUM_CARDS);
+        } while (child[zero] != 0);
+
+        do {
+            one = rand.nextInt(NUM_CARDS);
+        } while (child[one] != 1);
+
+        int temp = child[zero];
+        child[zero] = child[one];
+        child[one] = temp;
+
+        return child;
+    }
+
+    // int[][] population = [[1 4 7 8 10 1 3 4 5 6], [1 3 4 5 6 1 3 4 5 6],
+    // [1 3 4 5 6 1 3 4 5 6], [1 3 4 5 6 1 3 4 5 6]]
+
+    // Plan:
+    // geneticSearch(population):
+    // repeat for each generation:
+    // 1. check: does any row have fitness 0? → if yes, done
+    // 2. make a new, empty population
+    // 3. fill it with children, one at a time:
+    // mom = selection(population)
+    // dad = selection(population)
+    // child = crossover(mom, dad) ← repair happens inside
+    // sometimes: child = mutate(child)
+    // add child to the new population
+    // 4. the new population replaces the old one
+    // stop after a max number of generations if no perfect row was found
+
+    static void geneticSearch(int[][] population) {
+        for (int i = 0; i < NUM_CARDS; i++) {
+
+        }
+
+    }
+
+    // String representation of a child
+    static String toString(int[] child) {
         String pileA = "";
         int pileAValue = 0;
 
@@ -165,7 +204,7 @@ public class geneticAlgo {
         int pileBValue = 1;
 
         for (int i = 0; i < NUM_CARDS; i++) {
-            if (guess[i] == 0) {
+            if (child[i] == 0) {
                 pileA += i + 1 + " ";
                 pileAValue += i + 1;
             } else {
