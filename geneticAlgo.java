@@ -32,7 +32,7 @@ import java.util.Arrays;
 public class geneticAlgo {
 
     static Random rand = new Random();
-
+    static final int POP_SIZE = 20;
     static final int NUM_CARDS = 10;
     static final int SELECTION_SIZE = 3;
 
@@ -109,7 +109,6 @@ public class geneticAlgo {
 
     static int[] crossover(int[] mom, int[] dad) {
         int rando = rand.nextInt(NUM_CARDS - 1) + 1;
-        System.out.println("Cut point" + rando);
         int[] child = new int[NUM_CARDS];
 
         for (int i = 0; i < NUM_CARDS; i++) {
@@ -133,7 +132,7 @@ public class geneticAlgo {
         }
 
         while (count > NUM_CARDS / 2) {
-            int rando = rand.nextInt(NUM_CARDS) + 1;
+            int rando = rand.nextInt(NUM_CARDS);
             if (child[rando] == 0) {
                 child[rando] = 1;
                 count--;
@@ -141,12 +140,13 @@ public class geneticAlgo {
         }
 
         while (count < NUM_CARDS / 2) {
-            int rando = rand.nextInt(NUM_CARDS) + 1;
+            int rando = rand.nextInt(NUM_CARDS);
             if (child[rando] == 1) {
                 child[rando] = 0;
                 count++;
             }
         }
+
         return child;
     }
 
@@ -189,10 +189,48 @@ public class geneticAlgo {
     // stop after a max number of generations if no perfect row was found
 
     static void geneticSearch(int[][] population) {
-        for (int i = 0; i < NUM_CARDS; i++) {
+        int count = 0;
+        int MAX_GEN = 30;
+        int mutation_level = 3; // higher is less mutation. 0 crashes.
 
+        while (count <= MAX_GEN) {
+            int[][] nextGeneration = new int[POP_SIZE][];
+            for (int i = 0; i < POP_SIZE; i++) {
+
+                int[] mom = selection(population);
+                int[] dad = selection(population);
+                int[] child = crossover(mom, dad);
+
+                if (rand.nextInt(mutation_level) == 1) {
+                    child = mutate(child);
+                }
+
+                nextGeneration[i] = child;
+
+            }
+
+            int[] lowestChild = nextGeneration[0];
+            for (int i = 0; i < POP_SIZE; i++) {
+
+                if (fitness(nextGeneration[i]) < fitness(lowestChild)) {
+                    lowestChild = nextGeneration[i];
+                }
+            }
+
+            System.out.println("Count: " + count);
+            System.out.println("Fitness: " + fitness(lowestChild));
+            System.out.println("Lowest So Far: " + toString(lowestChild));
+
+            if (fitness(lowestChild) == 0) {
+                System.out.println("Search Complete: " + toString(lowestChild));
+                return;
+            }
+
+            population = nextGeneration;
+            count++;
         }
 
+        System.out.println("No perfect solution found after " + MAX_GEN + " generations");
     }
 
     // String representation of a child
@@ -234,12 +272,14 @@ public class geneticAlgo {
         // System.out.println("Selected Fitness is: " + fitness(select));
 
         // Test the crossover function
-        int[] mom = selection(population);
-        int[] dad = selection(population);
-        int[] child = crossover(mom, dad);
-        System.out.println("Dad " + toString(dad));
-        System.out.println("Mom " + toString(mom));
-        System.out.println("Child " + toString(child));
+        // int[] mom = selection(population);
+        // int[] dad = selection(population);
+        // int[] child = crossover(mom, dad);
+        // System.out.println("Dad " + toString(dad));
+        // System.out.println("Mom " + toString(mom));
+        // System.out.println("Child " + toString(child));
+
+        geneticSearch(population);
 
     }
 }
