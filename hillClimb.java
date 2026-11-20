@@ -10,7 +10,7 @@ public class hillClimb {
     // decide when to stop (two situations, could be good or bad)
     // Do we keep a running total of the action cost along the way.
     public static void hillClimbSearch(int[][] matrix, char[] state) {
-
+        System.out.println("Hill Climb Start");
     }
 
     // builds every state reachable with one action
