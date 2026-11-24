@@ -1,9 +1,16 @@
 //
 public class hillClimb {
 
-    // public static void toString(province){
+    static final char[] colours = { 'b', 'o', 'r', 'j' };
 
-    // }
+    public static void stateToString(char[] state) {
+        System.out.print("{");
+        for (char c : state) {
+            System.out.print(c + ", ");
+        }
+        System.out.print("}");
+        System.out.println("End");
+    }
 
     // main loop
     // decides which successor to pick
@@ -13,10 +20,31 @@ public class hillClimb {
         System.out.println("Hill Climb Start");
     }
 
-    // builds every state reachable with one action
-    // RESULT returns a copy that we can change
-    public static void successors(char[] state) {
+    public static char[][] successors(char[] state) {
+        char[][] result = new char[state.length * (colours.length - 1)][state.length];
+        int counter = 0;
+        // loop through each province
+        for (int i = 0; i < state.length; i++) {
 
+            char currentColour = state[i];
+            System.out.println(currentColour);
+            // for each of the four colours
+            for (int j = 0; j < colours.length; j++) {
+                if (colours[j] == currentColour) {
+                    continue;
+                } else {
+                    System.out.println("Current colour is : " + currentColour);
+                    System.out.println("Checking colour: " + colours[j]);
+                    char[] newState = state.clone();
+                    newState[i] = colours[j];
+                    System.out.println("New State: ");
+                    stateToString(newState);
+                    result[counter] = newState;
+                    counter++;
+                }
+            }
+        }
+        return result;
     }
 
     public static boolean isGoal(int[][] matrix, char[] state) {
@@ -30,10 +58,10 @@ public class hillClimb {
         for (int i = 0; i < matrixLength; i++) {
             for (int j = i + 1; j < matrixLength; j++) {
                 if (matrix[i][j] == 1) {
-                    System.out.println("New Neighbour for: " + i + ": " + j);
+                    // System.out.println("New Neighbour for: " + i + ": " + j);
                     if (state[i] == state[j]) {
                         count++;
-                        System.out.println("Matching colour found, count increased: " + count);
+                        // System.out.println("Matching colour found, count increased: " + count);
                     }
                 }
             }
@@ -77,5 +105,7 @@ public class hillClimb {
         char[] initialState = { 'b', 'o', 'o', 'o', 'r', 'r', 'j', 'j', 'j', 'j', 'j', 'j', 'j' };
 
         System.out.println(heuristic(adjacencyMatrix, initialState));
+
+        successors(initialState);
     }
 }
