@@ -3,21 +3,21 @@ public class hillClimb {
 
     static final char[] colours = { 'b', 'o', 'r', 'j' };
 
-    public static void stateToString(char[] state) {
-        System.out.print("{");
-        for (char c : state) {
-            System.out.print(c + ", ");
-        }
-        System.out.print("}");
-        System.out.println("End");
-    }
-
     // main loop
     // decides which successor to pick
     // decide when to stop (two situations, could be good or bad)
     // Do we keep a running total of the action cost along the way.
     public static void hillClimbSearch(int[][] matrix, char[] state) {
         System.out.println("Hill Climb Start");
+
+        // While current state is not a goal state
+
+        // Get the successors
+        // Find the one with the lowest h. If none are lower, we are in a valley/plateau
+        // so stop
+        // Otherwise make it a current state
+
+        // After loop, print each province with its final colour in order plus the cost.
     }
 
     public static char[][] successors(char[] state) {
@@ -25,20 +25,14 @@ public class hillClimb {
         int counter = 0;
         // loop through each province
         for (int i = 0; i < state.length; i++) {
-
             char currentColour = state[i];
-            System.out.println(currentColour);
             // for each of the four colours
             for (int j = 0; j < colours.length; j++) {
                 if (colours[j] == currentColour) {
                     continue;
                 } else {
-                    System.out.println("Current colour is : " + currentColour);
-                    System.out.println("Checking colour: " + colours[j]);
                     char[] newState = state.clone();
                     newState[i] = colours[j];
-                    System.out.println("New State: ");
-                    stateToString(newState);
                     result[counter] = newState;
                     counter++;
                 }
@@ -69,7 +63,15 @@ public class hillClimb {
         return count;
     }
 
-    public static int cost(char colour) {
+    public static int cost(char[] state) {
+        int total = 0;
+        for (int i = 0; i < state.length; i++) {
+            total += costConversion(state[i]);
+        }
+        return total;
+    }
+
+    public static int costConversion(char colour) {
         switch (colour) {
             case 'r':
                 return 2;
@@ -80,8 +82,17 @@ public class hillClimb {
             case 'j':
                 return 5;
             default:
-                return 0;
+                throw new IllegalArgumentException("This input is not allowed: " + colour);
         }
+    }
+
+    public static void stateToString(char[] state) {
+        System.out.print("{");
+        for (char c : state) {
+            System.out.print(c + ", ");
+        }
+        System.out.print("}");
+        System.out.println("End");
     }
 
     public static void main(String[] args) {
