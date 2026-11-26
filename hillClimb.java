@@ -7,21 +7,48 @@ public class hillClimb {
     // decides which successor to pick
     // decide when to stop (two situations, could be good or bad)
     // Do we keep a running total of the action cost along the way.
-    public static void hillClimbSearch(int[][] matrix, char[] state) {
+    public static char[] hillClimbSearch(int[][] matrix, char[] state) {
         System.out.println("Hill Climb Start");
+        char[] current = state.clone();
 
         // While current state is not a goal state
+        while (!isGoal(matrix, current)) {
+            // Get the successors
+            char[][] nextCycle = successors(current);
 
-        // Get the successors
-        // Find the one with the lowest h. If none are lower, we are in a valley/plateau
-        // so stop
-        // Otherwise make it a current state
+            // Set the lowest score to our current score
+            int lowest = heuristic(matrix, current);
+            char[] best = new char[state.length];
+            // Find the one with the lowest score
+            for (int i = 0; i < nextCycle.length; i++) {
+                int nextCycleScore = heuristic(matrix, nextCycle[i]);
 
-        // After loop, print each province with its final colour in order plus the cost.
+                if (nextCycleScore < lowest) {
+                    best = nextCycle[i];
+                    lowest = nextCycleScore;
+                }
+            }
+
+            if (lowest == heuristic(matrix, current)) {
+                // No goal found, plateau, break early.
+                break;
+            } else
+                // Loop again with the new best state
+                current = best;
+        }
+
+        if (heuristic(matrix, current) == 0) {
+            System.out.println("Solution Was Found!");
+            return current;
+        } else {
+            System.out.println("Solution Was Not Found...so sorry");
+            return current;
+        }
     }
 
     public static char[][] successors(char[] state) {
         char[][] result = new char[state.length * (colours.length - 1)][state.length];
+        // use a counter to keep track of where we are in the result[]
         int counter = 0;
         // loop through each province
         for (int i = 0; i < state.length; i++) {
@@ -31,7 +58,9 @@ public class hillClimb {
                 if (colours[j] == currentColour) {
                     continue;
                 } else {
+                    // clone the state before we change it
                     char[] newState = state.clone();
+                    // change one province to a new colour and return that state
                     newState[i] = colours[j];
                     result[counter] = newState;
                     counter++;
@@ -88,11 +117,15 @@ public class hillClimb {
 
     public static void stateToString(char[] state) {
         System.out.print("{");
-        for (char c : state) {
-            System.out.print(c + ", ");
+        for (int i = 0; i <= state.length - 1; i++) {
+            if (i < state.length - 1) {
+                System.out.print(state[i] + ", ");
+            } else {
+                System.out.print(state[i]);
+            }
         }
         System.out.print("}");
-        System.out.println("End");
+        System.out.println("");
     }
 
     public static void main(String[] args) {
@@ -114,9 +147,7 @@ public class hillClimb {
         };
         // BC AB SK MB ON QC NB NS PEI NL NU NT YT
         char[] initialState = { 'b', 'o', 'o', 'o', 'r', 'r', 'j', 'j', 'j', 'j', 'j', 'j', 'j' };
-
-        System.out.println(heuristic(adjacencyMatrix, initialState));
-
-        successors(initialState);
+        char[] finalState = hillClimbSearch(adjacencyMatrix, initialState);
+        stateToString(finalState);
     }
 }
